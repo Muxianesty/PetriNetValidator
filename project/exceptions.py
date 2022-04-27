@@ -1,0 +1,2 @@
+class NetNotParsableError(RuntimeError):
+    pass
