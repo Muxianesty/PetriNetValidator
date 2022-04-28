@@ -6,7 +6,14 @@ import os
 
 
 def checkIsom(first_net: PetriNet, second_net: PetriNet) -> bool:
-    return False
+    if len(first_net.places) != len(second_net.places) or len(first_net.arcs) != len(second_net.arcs) or len(
+            first_net.transitions) != len(second_net.transitions):
+        return False
+    first_init_places, first_fin_places = getInitAndFinPlaces(first_net)
+    second_init_places, second_fin_places = getInitAndFinPlaces(second_net)
+    if len(first_init_places) != len(second_init_places) or len(first_fin_places) != len(second_fin_places):
+        return False
+    return True
 
 
 def validateModels(interface: PetriNet, net: PetriNet, dir_path: str) -> PNetsStatus:
@@ -17,6 +24,7 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str) -> PNetsSt
     os.mkdir(dir_path)
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
+    counter = int(1)
     return PNetsStatus.FINE
 
 

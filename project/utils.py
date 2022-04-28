@@ -12,6 +12,12 @@ def parseNet(path: str):
         return PNetStatus.WRONG
 
 
+def getInitAndFinPlaces(net: PetriNet):
+    initial_places = [p for p in net.places if len(p.in_arcs) == 0]
+    final_places = [p for p in net.places if len(p.out_arcs) == 0]
+    return initial_places, final_places
+
+
 def getDirNameFromNets(first_path: str, second_path: str) -> str:
     return os.path.splitext(os.path.basename(first_path))[0] + "-" + os.path.splitext(os.path.basename(second_path))[0]
 
