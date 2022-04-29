@@ -13,10 +13,13 @@ def checkIsom(first_net: PetriNet, second_net: PetriNet) -> bool:
     second_init_places, second_fin_places = getInitAndFinPlaces(second_net)
     if len(first_init_places) != len(second_init_places) or len(first_fin_places) != len(second_fin_places):
         return False
-    return True
+    return True if isomHash(first_net, first_init_places) == isomHash(second_net, second_init_places) else False
 
 
-def validateModels(interface: PetriNet, net: PetriNet, dir_path: str) -> PNetsStatus:
+def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checked: bool = False) -> PNetsStatus:
+    if not wfn_checked:
+        if not wfn_alg.apply(interface) or not wfn_alg.apply(net):
+            return PNetsStatus.NOT_WFN
     if checkIsom(interface, net):
         return PNetsStatus.ISOM
     if os.path.exists(dir_path):
@@ -31,12 +34,16 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str) -> PNetsSt
 def start(first_path, second_path) -> None:
     first_status, interface = parseNet(first_path)
     second_status, net = parseNet(second_path)
-    if first_status == PNetStatus.WRONG or second_status == PNetStatus.WRONG:
+    if first_status == PNetStatus.ERROR or second_status == PNetStatus.ERROR:
         raise NetNotParsableError("PN Validation: One model or both models couldn't be imported.")
+    elif first_status == PNetStatus.NOT_WFN or second_status == PNetStatus.NOT_WFN:
+        print("PN Validation: One model or both imported models were not WorkFlow Nets -\n"
+              "Petri Nets with a singular place for input and a singular place for output.")
+        return
     if not os.path.exists(OUTPUT_PATH):
         os.mkdir(OUTPUT_PATH)
     dir_path = OUTPUT_PATH + os.sep + getDirNameFromNets(first_path, second_path) + os.sep
-    final_status = validateModels(interface, net, dir_path)
+    final_status = validateModels(interface, net, dir_path, True)
     if final_status == PNetsStatus.ISOM:
         print("PN Validation: Models are isomorphic.")
     elif final_status == PNetsStatus.NON_CONV:

@@ -7,11 +7,13 @@ OUTPUT_PATH = os.path.abspath(os.curdir + os.sep + "Output" + os.sep)
 
 
 class PNetStatus(Enum):
-    WRONG = 0
-    FINE = 1
+    ERROR = 0
+    NOT_WFN = 1
+    FINE = 2
 
 
 class PNetsStatus(Enum):
     ISOM = 0
-    NON_CONV = 1
-    FINE = 2
+    NOT_WFN = PNetStatus.NOT_WFN
+    NON_CONV = 2
+    FINE = 3
