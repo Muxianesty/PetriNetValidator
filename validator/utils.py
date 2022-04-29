@@ -23,10 +23,10 @@ def parseNet(path: str):
     try:
         net = pnml_imp.apply(os.path.abspath(path))[0]
         if not wfn_alg.apply(net):
-            return PNetStatus.NOT_WFN
+            return PNetStatus.NOT_WFN, None
         return PNetStatus.FINE, net
     except BaseException:
-        return PNetStatus.ERROR
+        return PNetStatus.ERROR, None
 
 
 def getInitAndFinPlaces(net: PetriNet):
@@ -44,8 +44,13 @@ def visualizeNet(net: PetriNet, file_path: str):
     pn_viz.save(gviz, file_path)
 
 
-def isomHash(net: PetriNet, init_places=None) -> int:
+def isomHash(net: PetriNet) -> int:
     result = int(0)
-    init_places = init_places if init_places is not None else getInitAndFinPlaces(net)[0]
-
+    data = list(net.arcs)
+    size = int(len(data))
+    for index in range(size):
+        for inner_index in range(index, size):
+            if data[index].source != data[inner_index].source and data[index].source != data[inner_index].target and \
+                    data[index].target != data[inner_index].source and data[index].target != data[inner_index].target:
+                result += 1
     return result

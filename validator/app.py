@@ -9,11 +9,11 @@ def checkIsom(first_net: PetriNet, second_net: PetriNet) -> bool:
     if len(first_net.places) != len(second_net.places) or len(first_net.arcs) != len(second_net.arcs) or len(
             first_net.transitions) != len(second_net.transitions):
         return False
-    first_init_places, first_fin_places = getInitAndFinPlaces(first_net)
-    second_init_places, second_fin_places = getInitAndFinPlaces(second_net)
+    # first_init_places, first_fin_places = getInitAndFinPlaces(first_net)
+    # second_init_places, second_fin_places = getInitAndFinPlaces(second_net)
     # if len(first_init_places) != len(second_init_places) or len(first_fin_places) != len(second_fin_places):
     #     return False
-    return True if isomHash(first_net, first_init_places) == isomHash(second_net, second_init_places) else False
+    return True if isomHash(first_net) == isomHash(second_net) else False
 
 
 def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checked: bool = False) -> PNetsStatus:
@@ -28,7 +28,6 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
     counter = int(1)
-
     return PNetsStatus.FINE
 
 
