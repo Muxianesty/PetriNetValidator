@@ -1,8 +1,22 @@
-from project import *
+from validator import *
+from enum import Enum
 import os.path
 from pm4py.objects.petri_net.obj import PetriNet
 from pm4py.objects.petri_net.importer import importer as pnml_imp
 from pm4py.algo.analysis.workflow_net import algorithm as wfn_alg
+
+
+class PNetStatus(Enum):
+    ERROR = 0
+    NOT_WFN = 1
+    FINE = 2
+
+
+class PNetsStatus(Enum):
+    ISOM = 0
+    NOT_WFN = PNetStatus.NOT_WFN
+    NON_CONV = 2
+    FINE = 3
 
 
 def parseNet(path: str):

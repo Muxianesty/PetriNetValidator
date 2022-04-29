@@ -1,5 +1,5 @@
-from project.exceptions import *
-from project.utils import *
+from validator.exceptions import *
+from validator.utils import *
 from pm4py.objects.petri_net.obj import *
 import shutil
 import os
@@ -11,8 +11,8 @@ def checkIsom(first_net: PetriNet, second_net: PetriNet) -> bool:
         return False
     first_init_places, first_fin_places = getInitAndFinPlaces(first_net)
     second_init_places, second_fin_places = getInitAndFinPlaces(second_net)
-    if len(first_init_places) != len(second_init_places) or len(first_fin_places) != len(second_fin_places):
-        return False
+    # if len(first_init_places) != len(second_init_places) or len(first_fin_places) != len(second_fin_places):
+    #     return False
     return True if isomHash(first_net, first_init_places) == isomHash(second_net, second_init_places) else False
 
 
@@ -28,6 +28,7 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
     counter = int(1)
+
     return PNetsStatus.FINE
 
 
