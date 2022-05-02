@@ -28,7 +28,7 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
     counter = int(1)
-    return PNetsStatus.FINE
+    return PNetsStatus.FINE if checkIsom(interface, net) else PNetsStatus.NON_CONV
 
 
 def start(first_path, second_path) -> None:

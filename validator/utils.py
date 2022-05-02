@@ -52,5 +52,5 @@ def isomHash(net: PetriNet) -> int:
         for inner_index in range(index, size):
             if data[index].source != data[inner_index].source and data[index].source != data[inner_index].target and \
                     data[index].target != data[inner_index].source and data[index].target != data[inner_index].target:
-                result += 1
+                result += data[index].weight * data[inner_index].weight
     return result
