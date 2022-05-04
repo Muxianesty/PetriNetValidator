@@ -9,11 +9,11 @@ def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.
     src_trs = set(arc.source for arc in src_arcs)
     dst_arcs = convertible.out_arcs
     dst_trs = set(arc.target for arc in dst_arcs)
-    original_places = {convertible}
+    original_places = set()
     original_transitions = src_trs.union(dst_trs)
-    original_arcs = set().union(src_arcs).union(dst_arcs)
+    original_arcs = src_arcs.union(dst_arcs)
     for place in net.places:
-        if place.in_arcs == src_arcs and place.out_arc == dst_arcs and place != convertible:
+        if place.in_arcs == src_arcs and place.out_arcs == dst_arcs and place != convertible:
             original_places.add(place)
             original_arcs.update(place.in_arcs)
             original_arcs.update(place.out_arcs)
@@ -24,8 +24,28 @@ def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.
     converted_subnet = deepcopy(PetriNet("FPP-2", {convertible}, original_transitions, src_arcs.union(dst_arcs)))
     return original_subnet, converted_subnet
 
+
 def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Transition):
-    return None, None
+    if convertible not in net.transitions:
+        return None, None
+    src_arcs = convertible.in_arcs
+    src_plcs = set(arc.source for arc in src_arcs)
+    dst_arcs = convertible.out_arcs
+    dst_plcs = set(arc.target for arc in dst_arcs)
+    original_places = src_plcs.union(dst_plcs)
+    original_transitions = set()
+    original_arcs = src_arcs.union(dst_arcs)
+    for transition in net.transitions:
+        if transition.in_arcs == src_arcs and transition.out_arcs == dst_arcs and transition != convertible:
+            original_transitions.add(transition)
+            original_arcs.update(transition.in_arcs)
+            original_arcs.update(transition.out_arcs)
+    original_subnet = deepcopy(PetriNet("FPT-1", original_places, original_transitions, original_arcs))
+    for transition in original_places:
+        remove_transition(net, transition)
+    convertible.name = target.name
+    converted_subnet = deepcopy(PetriNet("FPT-2", original_places, {convertible}, src_arcs.union(dst_arcs)))
+    return original_subnet, converted_subnet
 
 
 def apply_lte_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Transition):
