@@ -14,9 +14,8 @@ def checkIsom(first_net: PetriNet, second_net: PetriNet) -> bool:
 
 
 def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checked: bool = False) -> PNetsStatus:
-    if not wfn_checked:
-        if not wfn_alg.apply(interface) or not wfn_alg.apply(net):
-            return PNetsStatus.NOT_WFN
+    if not wfn_checked or not wfn_alg.apply(interface) or not wfn_alg.apply(net):
+        return PNetsStatus.NOT_WFN
     if checkIsom(interface, net):
         return PNetsStatus.ISOM
     if os.path.exists(dir_path):
@@ -25,7 +24,11 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
     counter = int(1)
-    return PNetsStatus.FINE if checkIsom(interface, net) else PNetsStatus.NON_CONV
+    if checkIsom(interface, net):
+        visualizeNet(net, dir_path + "converted.png")
+        return PNetsStatus.FINE
+    else:
+        return PNetsStatus.NON_CONV
 
 
 def start(first_path, second_path) -> None:

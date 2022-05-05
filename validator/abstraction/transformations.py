@@ -19,18 +19,18 @@ def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.
             original_places.add(place)
             original_arcs.update(place.in_arcs)
             original_arcs.update(place.out_arcs)
-    original_subnet = \
-        deepcopy(PetriNet("FPP-1", original_places, original_transitions, original_arcs, net.properties))
+    original_subnet = deepcopy(PetriNet("FPP-1", original_places.union({convertible}), original_transitions,
+                                        original_arcs, net.properties))
     for place in original_places:
         remove_place(net, place)
     convertible.name = target.name
-    converted_subnet = \
-        deepcopy(PetriNet("FPP-2", {convertible}, original_transitions, src_arcs.union(dst_arcs), net.properties))
+    converted_subnet = deepcopy(PetriNet("FPP-2", {convertible}, original_transitions,
+                                         src_arcs.union(dst_arcs), net.properties))
     return original_subnet, converted_subnet
 
 
 def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Transition):
-    if convertible not in net.transitions or target.label != convertible.label:
+    if convertible not in net.transitions:
         return None, None
     src_arcs = convertible.in_arcs
     src_plcs = set(arc.source for arc in src_arcs)
@@ -47,13 +47,13 @@ def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
             original_transitions.add(transition)
             original_arcs.update(transition.in_arcs)
             original_arcs.update(transition.out_arcs)
-    original_subnet = \
-        deepcopy(PetriNet("FPT-1", original_places, original_transitions, original_arcs, net.properties))
-    for transition in original_places:
+    original_subnet = deepcopy(PetriNet("FPT-1", original_places, original_transitions.union({convertible}),
+                                        original_arcs, net.properties))
+    for transition in original_transitions:
         remove_transition(net, transition)
     convertible.name = target.name
-    converted_subnet = \
-        deepcopy(PetriNet("FPT-2", original_places, {convertible}, src_arcs.union(dst_arcs), net.properties))
+    converted_subnet = deepcopy(PetriNet("FPT-2", original_places, {convertible},
+                                         src_arcs.union(dst_arcs), net.properties))
     return original_subnet, converted_subnet
 
 
