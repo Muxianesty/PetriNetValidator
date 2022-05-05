@@ -44,6 +44,10 @@ def visualizeNet(net: PetriNet, file_path: str):
     pn_viz.save(gviz, file_path)
 
 
+def isLocalLabel(label: str) -> bool:
+    return label is None or label.startswith('\n')
+
+
 def isomHash(net: PetriNet) -> int:
     result = int(0)
     data = list(net.arcs)

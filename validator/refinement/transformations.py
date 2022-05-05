@@ -3,8 +3,7 @@ from pm4py.objects.petri_net.utils.petri_utils import *
 
 
 def apply_ipp_rule(target: PetriNet.Place, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Place):
-    if target not in tg_net.places or convertible not in net.places or \
-            len(target.in_arcs) != len(convertible.in_arcs) or len(target.out_arcs) != len(convertible.out_arcs):
+    if target not in tg_net.places or convertible not in net.places:
         return None, None
     tg_src_trs = set(arc.source for arc in target.in_arcs)
     tg_dst_trs = set(arc.target for arc in target.out_arcs)
@@ -34,8 +33,7 @@ def apply_ipp_rule(target: PetriNet.Place, tg_net: PetriNet, net: PetriNet, conv
 
 
 def apply_ipt_rule(target: PetriNet.Transition, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Transition):
-    if target not in tg_net.transitions or convertible not in net.transitions or target.label != convertible.label or \
-            len(target.in_arcs) != len(convertible.in_arcs) or len(target.out_arcs) != len(convertible.out_arcs):
+    if target not in tg_net.transitions or convertible not in net.transitions or target.label != convertible.label:
         return None, None
     tg_src_plcs = set(arc.source for arc in target.in_arcs)
     tg_dst_plcs = set(arc.target for arc in target.out_arcs)

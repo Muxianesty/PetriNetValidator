@@ -1,6 +1,6 @@
 from pm4py.objects.petri_net.obj import PetriNet
 from pm4py.objects.petri_net.utils.petri_utils import *
-
+from validator.utils import *
 
 def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Place):
     if convertible not in net.places:
@@ -58,7 +58,7 @@ def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
 
 
 def apply_lte_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Transition):
-    if convertible not in net.transitions or convertible.label is not None or len(convertible.in_arcs) != 1 or \
+    if convertible not in net.transitions or not isLocalLabel(convertible.label) or len(convertible.in_arcs) != 1 or \
             len(convertible.out_arcs) != 1:
         return None, None
     src_arc: PetriNet.Arc = list(convertible.in_arcs)[0]
