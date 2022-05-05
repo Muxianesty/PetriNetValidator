@@ -1,14 +1,40 @@
 from pm4py.objects.petri_net.obj import PetriNet
 from pm4py.objects.petri_net.utils.petri_utils import *
-from validator import *
 
 
-def apply_ipp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Place):
+def apply_ipp_rule(target: PetriNet.Place, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Place):
     return None, None
 
 
-def apply_ipt_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Transition):
-    return None, None
+def apply_ipt_rule(target: PetriNet.Transition, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Transition):
+    if target not in tg_net.transitions or convertible not in net.transitions or target.label != convertible.label or \
+            len(target.in_arcs) != len(convertible.in_arcs) or len(target.out_arcs) != len(convertible.out_arcs):
+        return None, None
+    tg_src_plcs = set(arc.source for arc in target.in_arcs)
+    tg_dst_plcs = set(arc.target for arc in target.out_arcs)
+    targets = set()
+    for transition in tg_net.transitions:
+        trs_src_plcs = set(arc.source for arc in transition.in_arcs)
+        trs_dst_plcs = set(arc.target for arc in transition.out_arcs)
+        if transition != target and tg_src_plcs == trs_src_plcs and tg_dst_plcs == trs_dst_plcs:
+            targets.add(transition)
+    original_places = \
+        set(arc.source for arc in convertible.in_arcs).union(set(arc.target for arc in convertible.out_arcs))
+    original_transitions = {convertible}
+    original_arcs = convertible.in_arcs.union(convertible.out_arcs)
+    original_subnet = \
+        deepcopy(PetriNet("IPT-1", original_places, original_transitions, original_arcs, net.properties))
+    convertible.name = target.name
+    for tg in targets:
+        transition = add_transition(net, tg.name, convertible.label)
+        for arc in convertible.in_arcs:
+            original_arcs.add(add_arc_from_to(arc.source, transition, net, arc.weight, get_arc_type(arc)))
+        for arc in convertible.out_arcs:
+            original_arcs.add(add_arc_from_to(transition, net, arc.weight, get_arc_type(arc)))
+        original_transitions.add(transition)
+    converted_subnet = \
+        deepcopy(PetriNet("IPT-2", original_places, original_transitions, original_arcs, net.properties))
+    return original_subnet, converted_subnet
 
 
 def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Place):
