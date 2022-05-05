@@ -27,13 +27,15 @@ def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
     place = add_place(net, target_dst.name)
     trs_src_arc = add_arc_from_to(convertible, transition, net)
     trs_dst_arc = add_arc_from_to(transition, place, net)
-    copy = set(convertible.out_arcs)
-    for arc in copy:
+    copy_set = set(convertible.out_arcs)
+    for arc in copy_set:
         add_arc_from_to(place, arc.target, net, arc.weight, get_arc_type(arc))
         remove_arc(net, arc)
     original_places.add(place)
     original_transitions.add(transition)
-    converted_arcs = convertible.in_arcs.union(convertible.out_arcs).union(place.in_arcs).union(place.out_arcs)
+    converted_arcs = convertible.in_arcs.union(place.out_arcs)
+    converted_arcs.add(trs_src_arc)
+    converted_arcs.add(trs_dst_arc)
     converted_subnet = \
-        deepcopy(PetriNet("LTE-2", original_places, original_transitions, converted_arcs, net.properties))
+        deepcopy(PetriNet("LTI-2", original_places, original_transitions, converted_arcs, net.properties))
     return original_subnet, converted_subnet
