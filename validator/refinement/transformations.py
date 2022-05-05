@@ -3,7 +3,34 @@ from pm4py.objects.petri_net.utils.petri_utils import *
 
 
 def apply_ipp_rule(target: PetriNet.Place, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Place):
-    return None, None
+    if target not in tg_net.places or convertible not in net.places or \
+            len(target.in_arcs) != len(convertible.in_arcs) or len(target.out_arcs) != len(convertible.out_arcs):
+        return None, None
+    tg_src_trs = set(arc.source for arc in target.in_arcs)
+    tg_dst_trs = set(arc.target for arc in target.out_arcs)
+    targets = set()
+    for place in tg_net.places:
+        plc_src_trs = set(arc.source for arc in place.in_arcs)
+        plc_dst_trs = set(arc.target for arc in place.out_arcs)
+        if place != target and tg_src_trs == plc_src_trs and tg_dst_trs == plc_dst_trs:
+            targets.add(place)
+    original_places = {convertible}
+    original_transitions = \
+        set(arc.source for arc in convertible.in_arcs).union(set(arc.target for arc in convertible.out_arcs))
+    original_arcs = convertible.in_arcs.union(convertible.out_arcs)
+    original_subnet = \
+        deepcopy(PetriNet("IPP-1", original_places, original_transitions, original_arcs, net.properties))
+    convertible.name = target.name
+    for tg in targets:
+        place = add_place(net, tg.name)
+        for arc in convertible.in_arcs:
+            original_arcs.add(add_arc_from_to(arc.source, place, net, arc.weight, get_arc_type(arc)))
+        for arc in convertible.out_arcs:
+            original_arcs.add(add_arc_from_to(place, arc.target, net, arc.weight, get_arc_type(arc)))
+        original_places.add(place)
+    converted_subnet = \
+        deepcopy(PetriNet("IPP-2", original_places, original_transitions, original_arcs, net.properties))
+    return original_subnet, converted_subnet
 
 
 def apply_ipt_rule(target: PetriNet.Transition, tg_net: PetriNet, net: PetriNet, convertible: PetriNet.Transition):
@@ -30,7 +57,7 @@ def apply_ipt_rule(target: PetriNet.Transition, tg_net: PetriNet, net: PetriNet,
         for arc in convertible.in_arcs:
             original_arcs.add(add_arc_from_to(arc.source, transition, net, arc.weight, get_arc_type(arc)))
         for arc in convertible.out_arcs:
-            original_arcs.add(add_arc_from_to(transition, net, arc.weight, get_arc_type(arc)))
+            original_arcs.add(add_arc_from_to(transition, arc.target, net, arc.weight, get_arc_type(arc)))
         original_transitions.add(transition)
     converted_subnet = \
         deepcopy(PetriNet("IPT-2", original_places, original_transitions, original_arcs, net.properties))
