@@ -30,7 +30,7 @@ def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.
 
 
 def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Transition):
-    if convertible not in net.transitions:
+    if convertible not in net.transitions or target.label != convertible.label:
         return None, None
     src_arcs = convertible.in_arcs
     src_plcs = set(arc.source for arc in src_arcs)
@@ -42,7 +42,8 @@ def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
     for transition in net.transitions:
         trsn_in_plcs = set(arc.source for arc in transition.in_arcs)
         trsn_out_plcs = set(arc.target for arc in transition.out_arcs)
-        if transition != convertible and trsn_in_plcs == src_plcs and trsn_out_plcs == dst_plcs:
+        if transition != convertible and transition.label == convertible.label and \
+                trsn_in_plcs == src_plcs and trsn_out_plcs == dst_plcs:
             original_transitions.add(transition)
             original_arcs.update(transition.in_arcs)
             original_arcs.update(transition.out_arcs)
