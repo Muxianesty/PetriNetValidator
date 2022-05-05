@@ -58,7 +58,8 @@ def apply_fpt_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
 
 
 def apply_lte_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Transition):
-    if convertible not in net.transitions or len(convertible.in_arcs) != 1 or len(convertible.out_arcs) != 1:
+    if convertible not in net.transitions or convertible.label is not None or len(convertible.in_arcs) != 1 or \
+            len(convertible.out_arcs) != 1:
         return None, None
     src_arc: PetriNet.Arc = list(convertible.in_arcs)[0]
     dst_arc: PetriNet.Arc = list(convertible.out_arcs)[0]
