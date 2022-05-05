@@ -72,6 +72,8 @@ def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
     original_places = {convertible}
     conv_src_trs = set([arc.source for arc in convertible.in_arcs])
     conv_dst_trs = set([arc.target for arc in convertible.out_arcs])
+    if len(conv_src_trs.union(conv_dst_trs)) != 0:
+        return None, None
     original_transitions = conv_src_trs.union(conv_dst_trs)
     original_subnet = deepcopy(PetriNet("LTI-1", original_places, original_transitions,
                                         convertible.in_arcs.union(convertible.out_arcs), net.properties))
