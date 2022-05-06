@@ -63,7 +63,7 @@ def apply_ipt_rule(target: PetriNet.Transition, tg_net: PetriNet, net: PetriNet,
 
 
 def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: PetriNet.Place):
-    if convertible not in net.places or len(target.in_arcs) == 1 or len(target.out_arcs) == 1:
+    if convertible not in net.places or len(target.in_arcs) != 1 or len(target.out_arcs) != 1:
         return None, None
     target_src: PetriNet.Place = list(target.in_arcs)[0].source
     target_dst: PetriNet.Place = list(target.out_arcs)[0].target
@@ -75,18 +75,18 @@ def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
     original_transitions = conv_src_trs.union(conv_dst_trs)
     original_subnet = deepcopy(PetriNet("LTI-1", original_places, original_transitions,
                                         convertible.in_arcs.union(convertible.out_arcs), net.properties))
-    convertible.name = target_src.name
+    place = add_place(net, target_src.name)
     transition = add_transition(net, target.name)
-    place = add_place(net, target_dst.name)
-    trs_src_arc = add_arc_from_to(convertible, transition, net)
-    trs_dst_arc = add_arc_from_to(transition, place, net)
-    copy_set = set(convertible.out_arcs)
+    convertible.name = target_dst.name
+    copy_set = set(convertible.in_arcs)
     for arc in copy_set:
-        add_arc_from_to(place, arc.target, net, arc.weight, get_arc_type(arc))
+        add_arc_from_to(arc.source, place, net, arc.weight, get_arc_type(arc))
         remove_arc(net, arc)
+    trs_src_arc = add_arc_from_to(place, transition, net)
+    trs_dst_arc = add_arc_from_to(transition, convertible, net)
     original_places.add(place)
     original_transitions.add(transition)
-    converted_arcs = convertible.in_arcs.union(place.out_arcs)
+    converted_arcs = place.in_arcs.union(convertible.out_arcs)
     converted_arcs.add(trs_src_arc)
     converted_arcs.add(trs_dst_arc)
     converted_subnet = \

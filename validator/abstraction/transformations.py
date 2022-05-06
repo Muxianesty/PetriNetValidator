@@ -2,6 +2,7 @@ from pm4py.objects.petri_net.obj import PetriNet
 from pm4py.objects.petri_net.utils.petri_utils import *
 from validator.utils import *
 
+
 def apply_fpp_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Place):
     if convertible not in net.places:
         return None, None
@@ -88,7 +89,4 @@ def apply_lte_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.
 
 
 def apply_peps_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Place):
-    if convertible not in net.places:
-        return None, None
-    place = PetriNet.Place(target.name, convertible.in_arcs, convertible.out_arcs)
-    srcs_arcs = convertible.in_arcs
+    return None, None
