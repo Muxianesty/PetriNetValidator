@@ -48,6 +48,16 @@ def isLocalLabel(label: str) -> bool:
     return label is None or label.startswith('\n')
 
 
+def labelDictionary(net: PetriNet) -> dict:
+    result = {'\n': 0}
+    for trs in net.transitions:
+        if isLocalLabel(trs.label):
+            result['\n'] += 1
+        else:
+            result[trs.label] += 1
+    return result
+
+
 def isomHash(net: PetriNet) -> int:
     result = int(0)
     data = list(net.arcs)
