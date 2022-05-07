@@ -25,7 +25,9 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
         shutil.rmtree(dir_path)
     os.mkdir(dir_path)
     int_dict: dict = labelDictionary(interface)
+    int_plcs_count = len(interface.places)
     net_dict: dict = labelDictionary(net)
+    net_plcs_count = len(net.places)
     if len(int_dict.keys()) != len(net_dict.keys()):
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
@@ -42,6 +44,10 @@ def validateModels(interface: PetriNet, net: PetriNet, dir_path: str, wfn_checke
                 visualizeNet(converted, dir_path + str(counter) + "-2.png")
                 counter += 1
                 need_to_continue = True
+                break
+        if not need_to_continue:
+            for place in net.places:
+                print()
         if not need_to_continue:
             break
     if checkIsom(interface, net):

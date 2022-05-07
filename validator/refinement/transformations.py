@@ -92,3 +92,7 @@ def apply_lti_rule(target: PetriNet.Transition, net: PetriNet, convertible: Petr
     converted_subnet = \
         deepcopy(PetriNet("LTI-2", original_places, original_transitions, converted_arcs, net.properties))
     return original_subnet, converted_subnet
+
+
+def apply_psi_rule():
+    return None, None
