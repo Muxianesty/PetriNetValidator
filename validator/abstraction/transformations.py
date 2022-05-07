@@ -3,8 +3,8 @@ from pm4py.objects.petri_net.utils.petri_utils import *
 from validator.utils import *
 
 
-def apply_fpp_rule(net: PetriNet, target: PetriNet.Place):
-    if target not in net.places:
+def apply_fpp_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
+    if target not in m_net.net.places:
         return None, None
     src_arcs = target.in_arcs
     src_trs = set(arc.source for arc in src_arcs)
@@ -13,7 +13,7 @@ def apply_fpp_rule(net: PetriNet, target: PetriNet.Place):
     original_transitions = src_trs.union(dst_trs)
     original_arcs = src_arcs.union(dst_arcs)
     other = None
-    for place in net.places:
+    for place in m_net.net.places:
         place_in_trs = set(arc.source for arc in place.in_arcs)
         place_out_trs = set(arc.target for arc in place.out_arcs)
         if place != target and place_in_trs == src_trs and place_out_trs == dst_trs:
@@ -24,15 +24,15 @@ def apply_fpp_rule(net: PetriNet, target: PetriNet.Place):
     if other is None:
         return None, None
     original_subnet = deepcopy(PetriNet("FPP-1", {target, other}, original_transitions,
-                                        original_arcs, net.properties))
-    remove_place(net, other)
+                                        original_arcs, m_net.net.properties))
+    remove_place(m_net.net, other)
     converted_subnet = deepcopy(PetriNet("FPP-2", {target}, original_transitions,
-                                         src_arcs.union(dst_arcs), net.properties))
+                                         src_arcs.union(dst_arcs), m_net.net.properties))
     return original_subnet, converted_subnet
 
 
-def apply_fpt_rule(net: PetriNet, target: PetriNet.Transition):
-    if target not in net.transitions:
+def apply_fpt_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
+    if target not in m_net.net.transitions:
         return None, None
     src_arcs = target.in_arcs
     src_trs = set(arc.source for arc in src_arcs)
@@ -41,7 +41,7 @@ def apply_fpt_rule(net: PetriNet, target: PetriNet.Transition):
     original_places = src_trs.union(dst_trs)
     original_arcs = src_arcs.union(dst_arcs)
     other = None
-    for transition in net.transitions:
+    for transition in m_net.net.transitions:
         trs_in_plcs = set(arc.source for arc in transition.in_arcs)
         trs_out_plcs = set(arc.target for arc in transition.out_arcs)
         if transition != target and transition.label == target.label and \
@@ -53,15 +53,15 @@ def apply_fpt_rule(net: PetriNet, target: PetriNet.Transition):
     if other is None:
         return None, None
     original_subnet = deepcopy(PetriNet("FPT-1", original_places, {target, other},
-                                        original_arcs, net.properties))
-    remove_transition(net, other)
+                                        original_arcs, m_net.net.properties))
+    remove_transition(m_net.net, other)
     converted_subnet = deepcopy(PetriNet("FPT-2", original_places, {target},
-                                         src_arcs.union(dst_arcs), net.properties))
+                                         src_arcs.union(dst_arcs), m_net.net.properties))
     return original_subnet, converted_subnet
 
 
-def apply_lte_rule(target: PetriNet.Transition, net: PetriNet):
-    if target not in net.transitions or not isLocalLabel(target.label) or len(target.in_arcs) != 1 or \
+def apply_lte_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
+    if target not in m_net.net.transitions or not isLocalLabel(target.label) or len(target.in_arcs) != 1 or \
             len(target.out_arcs) != 1:
         return None, None
     src_arc: PetriNet.Arc = list(target.in_arcs)[0]
@@ -77,16 +77,16 @@ def apply_lte_rule(target: PetriNet.Transition, net: PetriNet):
     original_transitions = src_trs.union(dst_trs).union({target})
     original_arcs = src.in_arcs.union(src.out_arcs).union(dst.in_arcs).union(dst.out_arcs)
     original_subnet = \
-        deepcopy(PetriNet("LTE-1", original_places, original_transitions, original_arcs, net.properties))
+        deepcopy(PetriNet("LTE-1", original_places, original_transitions, original_arcs, m_net.net.properties))
     dst.name = target.name
     for arc in src.in_arcs:
-        add_arc_from_to(arc.source, dst, net, arc.weight, get_arc_type(arc))
+        add_arc_from_to(arc.source, dst, m_net.net, arc.weight, get_arc_type(arc))
     original_places.remove(src)
-    remove_place(net, src)
+    remove_place(m_net.net, src)
     original_transitions.remove(target)
-    remove_transition(net, target)
+    remove_transition(m_net.net, target)
     converted_subnet = deepcopy(PetriNet("LTE-2", original_places, original_transitions,
-                                         dst.in_arcs.union(dst.out_arcs), net.properties))
+                                         dst.in_arcs.union(dst.out_arcs), m_net.net.properties))
     return original_subnet, converted_subnet
 
 
