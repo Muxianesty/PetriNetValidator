@@ -29,8 +29,11 @@ class MarkedPetriNet(object):
 
     def __deepcopy__(self, memodict={}):
         copy_net = self.__net.__deepcopy__(memodict)
+        # copy_net = deepcopy(self.__net)
         copy_i_mkg = self.__i_mkg.__deepcopy__(memodict)
+        # copy_i_mkg = deepcopy(self.__i_mkg)
         copy_f_mkg = self.__f_mkg.__deepcopy__(memodict)
+        # copy_f_mkg = deepcopy(self.__f_mkg)
         return MarkedPetriNet(copy_net, copy_i_mkg, copy_f_mkg)
 
     def __get_net(self) -> PetriNet:
@@ -79,6 +82,8 @@ def isLocalLabel(label: str) -> bool:
 def labelDictionary(m_net: MarkedPetriNet) -> dict:
     result = {'\n': 0}
     for trs in m_net.net.transitions:
+        if trs.label not in result:
+            result[trs.label] = 0
         if isLocalLabel(trs.label):
             result['\n'] += 1
         else:

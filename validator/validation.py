@@ -14,28 +14,28 @@ def checkIsom(first_net: MarkedPetriNet, second_net: MarkedPetriNet) -> bool:
     return True if isomHash(first_net) == isomHash(second_net) else False
 
 
-def validateModels(interface: MarkedPetriNet, net: MarkedPetriNet,
+def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                    dir_path: str, wfn_checked: bool = False) -> PNetsStatus:
     if not dir_path.endswith(os.sep):
         dir_path += os.sep
     if not wfn_checked:
-        if not wfn_alg.apply(interface.net) or not wfn_alg.apply(net.net):
+        if not wfn_alg.apply(interface.net) or not wfn_alg.apply(m_net.net):
             return PNetsStatus.NOT_WFN
-    if checkIsom(interface, net):
+    if checkIsom(interface, m_net):
         return PNetsStatus.ISOM
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
     os.mkdir(dir_path)
     int_dict: dict = labelDictionary(interface)
     int_plcs_count = len(interface.net.places)
-    net_dict: dict = labelDictionary(net)
-    net_plcs_count = len(net.net.places)
+    net_dict: dict = labelDictionary(m_net)
+    net_plcs_count = len(m_net.net.places)
     if len(int_dict.keys()) != len(net_dict.keys()):
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
         return PNetsStatus.NON_CONV
     visualizeNet(interface, dir_path + "interface.png")
-    visualizeNet(net, dir_path + "net.png")
+    visualizeNet(m_net, dir_path + "net.png")
     counter = int(1)
     while True:
         need_to_continue: bool = False
@@ -48,12 +48,18 @@ def validateModels(interface: MarkedPetriNet, net: MarkedPetriNet,
                 need_to_continue = True
                 break
         if not need_to_continue:
-            for place in net.places:
-                print()
+            for place in m_net.net.places:
+                original, converted = None, None
+                if original is not None and converted is not None:
+                    visualizeNet(original, dir_path + str(counter) + "-1.png")
+                    visualizeNet(converted, dir_path + str(counter) + "-2.png")
+                    counter += 1
+                    need_to_continue = True
+                    break
         if not need_to_continue:
             break
-    if checkIsom(interface, net):
-        visualizeNet(net, dir_path + "converted.png")
+    if checkIsom(interface, m_net):
+        visualizeNet(m_net, dir_path + "converted.png")
         return PNetsStatus.FINE
     else:
         if os.path.exists(dir_path):

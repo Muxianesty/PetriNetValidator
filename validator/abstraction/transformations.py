@@ -94,5 +94,5 @@ def apply_lte_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
     return original_subnet, converted_subnet
 
 
-def apply_peps_rule(target: PetriNet.Place, net: PetriNet, convertible: PetriNet.Place):
+def apply_peps_rule(target: PetriNet.Place, net: PetriNet):
     return None, None
