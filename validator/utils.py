@@ -27,6 +27,12 @@ class MarkedPetriNet(object):
         self.__i_mkg: Marking = Marking() if i_mkg is None else i_mkg
         self.__f_mkg: Marking = Marking() if f_mkg is None else f_mkg
 
+    def __deepcopy__(self, memodict={}):
+        copy_net = self.__net.__deepcopy__(memodict)
+        copy_i_mkg = self.__i_mkg.__deepcopy__(memodict)
+        copy_f_mkg = self.__f_mkg.__deepcopy__(memodict)
+        return MarkedPetriNet(copy_net, copy_i_mkg, copy_f_mkg)
+
     def __get_net(self) -> PetriNet:
         return self.__net
 
