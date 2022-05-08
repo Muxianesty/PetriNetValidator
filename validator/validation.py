@@ -40,10 +40,10 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(m_net, dir_path + "net.png")
     counter = int(1)
-    while True:
-        need_to_continue: bool = False
+    need_to_continue: bool = True
+    while need_to_continue:
+        original, converted = None, None
         for net_key in net_dict:
-            original, converted = None, None
             if mode > 0 and len(int_dict[net_key]) < len(net_dict[net_key]):
                 if int_plcs_count < net_plcs_count and isLocalLabel(net_key):
                     for trs in net_dict[net_key]:
@@ -56,27 +56,34 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                     original, converted = apply_fpt_rule(m_net, net_dict[net_key][0], net_dict[net_key][-1])
                     if original is not None:
                         net_dict[net_key].pop()
-            elif mode < 0 and int_dict[net_key] > net_dict[net_key]:
-                original, converted, new_trs = apply_ipt_rule(m_net, net_dict[net_key][0])
-                if original is not None:
-
+            elif mode < 0 and len(int_dict[net_key]) > len(net_dict[net_key]):
+                if int_plcs_count > net_plcs_count and isLocalLabel(net_key):
+                    for place in m_net.net.places:
+                        original, converted, new_trs = apply_lti_rule(m_net, place)
+                        if original is not None:
+                            net_plcs_count += 1
+                            net_dict[net_key].append(new_trs)
+                            break
+                else:
+                    original, converted, new_trs = apply_ipt_rule(m_net, net_dict[net_key][0])
+                    if original is not None:
+                        net_dict[net_key].append(new_trs)
             if original is not None:
-                visualizeNet(original, dir_path + str(counter) + "-1.png")
-                visualizeNet(converted, dir_path + str(counter) + "-2.png")
-                counter += 1
-                need_to_continue = True
                 break
-        if not need_to_continue:
+        if original is None:
             for place in m_net.net.places:
-                original, converted = None, None
-                if original is not None and converted is not None:
-                    visualizeNet(original, dir_path + str(counter) + "-1.png")
-                    visualizeNet(converted, dir_path + str(counter) + "-2.png")
-                    counter += 1
-                    need_to_continue = True
+                if mode > 0 and int_plcs_count < net_plcs_count:
+                    original, converted = apply_fpp_rule(m_net, place)
+                elif mode < 0 and int_plcs_count > net_plcs_count:
+                    original, converted = apply_ipp_rule(m_net, place)
+                if original is not None:
                     break
-        if not need_to_continue:
-            break
+        if original is not None:
+            visualizeNet(original, dir_path + str(counter) + "-1.png")
+            visualizeNet(converted, dir_path + str(counter) + "-2.png")
+            counter += 1
+        else:
+            need_to_continue = False
     if compareNets(interface, m_net) == 0:
         visualizeNet(m_net, dir_path + "converted.png")
         return PNetsStatus.FINE
