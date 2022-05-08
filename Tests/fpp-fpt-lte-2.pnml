@@ -1,5 +1,5 @@
 <pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
-  <net id="fpp-fpt-lte-2" type="http://ifnml.process-security.de/grammar/v1.0/cpnet">
+  <net id="fpp-fpt-lte-2.pnml" type="http://ifnml.process-security.de/grammar/v1.0/cpnet">
     <page id="top-level">
       <place id="p0">
         <name>
@@ -40,6 +40,9 @@
           <fill color="#B6CAE4" gradient-color="none"/>
           <line color="#000000" shape="line" style="solid" width="1.0"/>
         </graphics>
+        <initialMarking>
+          <text>3</text>
+        </initialMarking>
       </place>
       <place id="p2">
         <name>
@@ -60,6 +63,9 @@
           <fill color="#B6CAE4" gradient-color="none"/>
           <line color="#000000" shape="line" style="solid" width="1.0"/>
         </graphics>
+        <initialMarking>
+          <text>2</text>
+        </initialMarking>
       </place>
       <place id="p3">
         <name>
@@ -80,6 +86,9 @@
           <fill color="#B6CAE4" gradient-color="none"/>
           <line color="#000000" shape="line" style="solid" width="1.0"/>
         </graphics>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
       </place>
       <place id="p4">
         <name>
@@ -403,6 +412,7 @@
       <arc id="arcPT_p1t5" source="p1" target="t5">
         <graphics>
           <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="225.0" y="272.0"/>
         </graphics>
         <inscription>
           <text>1</text>
@@ -501,6 +511,7 @@
       <arc id="arcPT_p2t5" source="p2" target="t5">
         <graphics>
           <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="375.0" y="277.0"/>
         </graphics>
         <inscription>
           <text>1</text>
