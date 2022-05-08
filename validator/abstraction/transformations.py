@@ -98,7 +98,7 @@ def apply_lte_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
     original_transitions.remove(target)
     remove_transition(m_net.net, target)
     converted_subnet = deepcopy(MarkedPetriNet(PetriNet("LTE-2", original_places, original_transitions,
-                                                        dst.in_arcs.union(dst.out_arcs), m_net.net.properties),
+                                                        src.in_arcs.union(src.out_arcs), m_net.net.properties),
                                                m_net.init_m, m_net.fin_m))
     return original_subnet, converted_subnet
 
