@@ -59,7 +59,7 @@ def apply_lti_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("LTI-1", original_places, original_transitions,
                                                        target.in_arcs.union(target.out_arcs), m_net.net.properties),
                                               m_net.init_m, m_net.fin_m))
-    transition = add_transition(m_net.net)
+    transition = add_transition(m_net.net, label=EMPTY_LABEL)
     place = add_place(m_net.net)
     copy_set = set(target.out_arcs)
     for arc in copy_set:

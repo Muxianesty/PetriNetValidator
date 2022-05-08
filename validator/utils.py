@@ -5,6 +5,8 @@ from pm4py.objects.petri_net.obj import *
 from pm4py.objects.petri_net.importer import importer as pnml_imp
 from pm4py.algo.analysis.workflow_net import algorithm as wfn_alg
 
+EMPTY_LABEL: str = '\n'
+
 
 class PNetStatus(Enum):
     ERROR = 0
@@ -55,7 +57,8 @@ def parseNet(path: str):
         net, initial_m, final_m = pnml_imp.apply(os.path.abspath(path))
         if not wfn_alg.apply(net):
             return PNetStatus.NOT_WFN, None
-        return PNetStatus.FINE, MarkedPetriNet(net, initial_m, final_m)
+        result: MarkedPetriNet = MarkedPetriNet(net, initial_m, final_m)
+        return PNetStatus.FINE, fixLocalLabels(result)
     except BaseException:
         return PNetStatus.ERROR, None
 
@@ -79,14 +82,20 @@ def isLocalLabel(label: str) -> bool:
     return label is None or label.startswith('\n')
 
 
+def fixLocalLabels(m_net: MarkedPetriNet) -> MarkedPetriNet:
+    for transition in m_net.net.transitions:
+        transition.label = EMPTY_LABEL if isLocalLabel(transition.label) else transition.label
+    return m_net
+
+
 def labelDictionary(m_net: MarkedPetriNet) -> dict:
-    result = {'\n': []}
+    result = {EMPTY_LABEL: []}
     for trs in m_net.net.transitions:
-        if trs.label not in result:
-            result[trs.label] = []
         if isLocalLabel(trs.label):
-            result['\n'].append(trs)
+            result[EMPTY_LABEL].append(trs)
         else:
+            if trs.label not in result:
+                result[trs.label] = []
             result[trs.label].append(trs)
     return result
 
