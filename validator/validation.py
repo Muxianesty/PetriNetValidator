@@ -6,12 +6,14 @@ import shutil
 import os
 
 
-def checkIsom(first_net: MarkedPetriNet, second_net: MarkedPetriNet) -> bool:
-    if len(first_net.net.places) != len(second_net.net.places) or \
-            len(first_net.net.arcs) != len(second_net.net.arcs) or \
-            len(first_net.net.transitions) != len(second_net.net.transitions):
-        return False
-    return True if isomHash(first_net) == isomHash(second_net) else False
+def compareNets(first_net: MarkedPetriNet, second_net: MarkedPetriNet) -> int:
+    if len(first_net.net.transitions) < len(second_net.net.transitions) or \
+            len(first_net.net.places) < len(second_net.net.places):
+        return 1
+    elif len(first_net.net.transitions) > len(second_net.net.transitions) or \
+            len(first_net.net.places) > len(second_net.net.places):
+        return -1
+    return 0 if isomHash(first_net) == isomHash(second_net) else 1
 
 
 def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
@@ -21,7 +23,8 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
     if not wfn_checked:
         if not wfn_alg.apply(interface.net) or not wfn_alg.apply(m_net.net):
             return PNetsStatus.NOT_WFN
-    if checkIsom(interface, m_net):
+    mode = compareNets(interface, m_net)
+    if mode == 0:
         return PNetsStatus.ISOM
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
@@ -39,7 +42,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
     counter = int(1)
     while True:
         need_to_continue: bool = False
-        for net_key in net_dict.keys():
+        for net_key in net_dict:
             original, converted = None, None
             if original is not None and converted is not None:
                 visualizeNet(original, dir_path + str(counter) + "-1.png")
@@ -58,7 +61,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                     break
         if not need_to_continue:
             break
-    if checkIsom(interface, m_net):
+    if compareNets(interface, m_net) == 0:
         visualizeNet(m_net, dir_path + "converted.png")
         return PNetsStatus.FINE
     else:
