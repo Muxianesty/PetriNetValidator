@@ -5,7 +5,7 @@ from validator.utils import *
 
 def apply_ipp_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     if target not in m_net.net.places:
-        return None, None
+        return None, None, None
     original_places = {target}
     original_transitions = \
         set(arc.source for arc in target.in_arcs).union(set(arc.target for arc in target.out_arcs))
@@ -22,12 +22,12 @@ def apply_ipp_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     converted_subnet = \
         deepcopy(MarkedPetriNet(PetriNet("IPP-2", original_places, original_transitions,
                                          original_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
-    return original_subnet, converted_subnet
+    return original_subnet, converted_subnet, place
 
 
 def apply_ipt_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
     if target not in m_net.net.transitions:
-        return None, None
+        return None, None, None
     original_places = \
         set(arc.source for arc in target.in_arcs).union(set(arc.target for arc in target.out_arcs))
     original_transitions = {target}
@@ -44,17 +44,17 @@ def apply_ipt_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
     converted_subnet = \
         deepcopy(MarkedPetriNet(PetriNet("IPT-2", original_places, original_transitions,
                                          original_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
-    return original_subnet, converted_subnet
+    return original_subnet, converted_subnet, transition
 
 
 def apply_lti_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     if target not in m_net.net.places:
-        return None, None
+        return None, None, None
     original_places = {target}
     target_src_trs = set([arc.source for arc in target.in_arcs])
     target_dst_trs = set([arc.target for arc in target.out_arcs])
     if len(target_src_trs.intersection(target_dst_trs)) != 0:
-        return None, None
+        return None, None, None
     original_transitions = target_src_trs.union(target_dst_trs)
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("LTI-1", original_places, original_transitions,
                                                        target.in_arcs.union(target.out_arcs), m_net.net.properties),
@@ -75,7 +75,7 @@ def apply_lti_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     converted_subnet = \
         deepcopy(MarkedPetriNet(PetriNet("LTI-2", original_places, original_transitions,
                                          converted_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
-    return original_subnet, converted_subnet
+    return original_subnet, converted_subnet, transition
 
 
 def apply_psi_rule():

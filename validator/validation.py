@@ -1,7 +1,7 @@
 from validator.exceptions import NetNotParsableError
 from validator.utils import *
-from validator.refinement import *
-from validator.abstraction import *
+from validator.refinement.transformations import *
+from validator.abstraction.transformations import *
 import shutil
 import os
 
@@ -33,7 +33,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
     int_plcs_count = len(interface.net.places)
     net_dict: dict = labelDictionary(m_net)
     net_plcs_count = len(m_net.net.places)
-    if len(int_dict.keys()) != len(net_dict.keys()):
+    if len(int_dict) != len(net_dict):
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
         return PNetsStatus.NON_CONV
@@ -44,7 +44,23 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
         need_to_continue: bool = False
         for net_key in net_dict:
             original, converted = None, None
-            if original is not None and converted is not None:
+            if mode > 0 and len(int_dict[net_key]) < len(net_dict[net_key]):
+                if int_plcs_count < net_plcs_count and isLocalLabel(net_key):
+                    for trs in net_dict[net_key]:
+                        original, converted = apply_lte_rule(m_net, trs)
+                        if original is not None:
+                            net_plcs_count -= 1
+                            net_dict[net_key].remove(trs)
+                            break
+                else:
+                    original, converted = apply_fpt_rule(m_net, net_dict[net_key][0], net_dict[net_key][-1])
+                    if original is not None:
+                        net_dict[net_key].pop()
+            elif mode < 0 and int_dict[net_key] > net_dict[net_key]:
+                original, converted, new_trs = apply_ipt_rule(m_net, net_dict[net_key][0])
+                if original is not None:
+
+            if original is not None:
                 visualizeNet(original, dir_path + str(counter) + "-1.png")
                 visualizeNet(converted, dir_path + str(counter) + "-2.png")
                 counter += 1

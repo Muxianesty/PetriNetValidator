@@ -80,14 +80,14 @@ def isLocalLabel(label: str) -> bool:
 
 
 def labelDictionary(m_net: MarkedPetriNet) -> dict:
-    result = {'\n': 0}
+    result = {'\n': []}
     for trs in m_net.net.transitions:
         if trs.label not in result:
-            result[trs.label] = 0
+            result[trs.label] = []
         if isLocalLabel(trs.label):
-            result['\n'] += 1
+            result['\n'].append(trs)
         else:
-            result[trs.label] += 1
+            result[trs.label].append(trs)
     return result
 
 
