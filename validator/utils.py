@@ -55,10 +55,9 @@ class MarkedPetriNet(object):
 def parseNet(path: str):
     try:
         net, initial_m, final_m = pnml_imp.apply(os.path.abspath(path))
-        if not wfn_alg.apply(net):
-            return PNetStatus.NOT_WFN, None
+        res_status: PNetStatus = PNetStatus.NOT_WFN if not wfn_alg.apply(net) else PNetStatus.FINE
         result: MarkedPetriNet = MarkedPetriNet(net, initial_m, final_m)
-        return PNetStatus.FINE, fixLocalLabels(result)
+        return res_status, fixLocalLabels(result)
     except BaseException:
         return PNetStatus.ERROR, None
 

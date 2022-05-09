@@ -71,6 +71,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
             if original is not None:
                 break
         if original is None:
+            #todo Correct the cases with the places.
             for place in m_net.net.places:
                 if mode > 0 and int_plcs_count < net_plcs_count:
                     original, converted = apply_fpp_rule(m_net, place)
