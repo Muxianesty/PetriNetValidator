@@ -59,6 +59,9 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
             elif mode < 0 and len(int_dict[net_key]) > len(net_dict[net_key]):
                 if int_plcs_count > net_plcs_count and isLocalLabel(net_key):
                     for place in m_net.net.places:
+                        first_count = int(0)
+                        second_count = int(0)
+
                         original, converted, new_trs = apply_lti_rule(m_net, place)
                         if original is not None:
                             net_plcs_count += 1
