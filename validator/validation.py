@@ -73,7 +73,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                         net_dict[net_key].append(new_trs)
             if original is not None:
                 break
-        if original is None:
+        if original is None and int_plcs_count != net_plcs_count:
             #todo Correct the cases with the places.
             for place in m_net.net.places:
                 if mode > 0 and int_plcs_count < net_plcs_count:
@@ -82,7 +82,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                     original, converted = apply_ipp_rule(m_net, place)
                 if original is not None:
                     break
-        if original is not None:
+        if original is not None and os.path.exists(dir_path):
             visualizeNet(original, dir_path + str(counter) + "-1.png")
             visualizeNet(converted, dir_path + str(counter) + "-2.png")
             counter += 1

@@ -52,7 +52,7 @@ views on the model respectively).
          (<a href="https://graphviz.org/download/">here</a>); </li>
     <li> Download and install a Petri net editor if needed
          (we recommend using WOLFGANG -
-         <a href="https://github.com/iig-uni-freiburg/WOLFGANG">here</a>; </li>
+         <a href="https://github.com/iig-uni-freiburg/WOLFGANG">here)</a>; </li>
     <li> Setup a Python virtual environment in the downloaded repository
          by using <code>python -m venv {env_name} </code>, with "env_name" as your
          environment directory name and activate it with { </li>
