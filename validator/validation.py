@@ -118,7 +118,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                         original, converted = apply_fpp_rule(m_net, plcs_lst[index])
                         net_plcs_count -= 1
                     elif mode < 0 and int_plcs_count > net_plcs_count and in_int_src > in_net_src:
-                        original, converted, place = apply_ipp_rule(m_net, plcs_lst[index])
+                        original, converted, new_place = apply_ipp_rule(m_net, plcs_lst[index])
                         net_plcs_count += 1
                     if original is not None:
                         break
@@ -137,14 +137,14 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
         return PNetsStatus.NON_CONV
 
 
-def start(first_path, second_path) -> None:
+def start(first_path: str, second_path: str) -> None:
     first_status, interface = parseNet(first_path)
     second_status, net = parseNet(second_path)
     if first_status == PNetStatus.ERROR or second_status == PNetStatus.ERROR:
         raise NetNotParsableError("PN Validation: One model or both models couldn't be imported.")
     elif first_status == PNetStatus.NOT_WFN or second_status == PNetStatus.NOT_WFN:
         print("PN Validation: One model or both imported models were not WorkFlow Nets -\n"
-              "Petri Nets with a singular place for input and a singular place for output.")
+              "Petri Nets with a singular place for input and a singular place for output with reachable transitions.")
         return
     if not os.path.exists(OUTPUT_PATH):
         os.mkdir(OUTPUT_PATH)

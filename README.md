@@ -55,15 +55,15 @@ views on the model respectively).
          <a href="https://github.com/iig-uni-freiburg/WOLFGANG">here)</a>; </li>
     <li> Setup a Python virtual environment in the downloaded repository
          by using <code>python -m venv {env_name} </code>, with "env_name" as your
-         environment directory name and activate it with { </li>
+         environment directory name;</li>
     <li> Download dependencies with "pip" (from virtual environment): 
          <code>pip install -r libs.txt</code> or just <code>pip install pm4py</code> as
-         pm4py-library is the only main library being used in the project </li>
+         pm4py-library is the only main library being used in the project. </li>
 </ol>
 
 <strong> Execution: <br> </strong>
-<code>{env_name}\Scripts\python3 main.py {f1} {f2}</code> for Windows <br>
-<code>{env_name}/bin/python3 main.py {f1} {f2}</code> for Linux <br>
+<code>{env_name}\Scripts\python main.py {f1} {f2}</code> for Windows <br>
+<code>{env_name}/bin/python main.py {f1} {f2}</code> for Linux/MacOS <br>
 where "env_name" is the name of the virtual environment directory, 
 "f1" and "f2" are absolute/relative paths to the files of the two Workflow Petri net models.
 

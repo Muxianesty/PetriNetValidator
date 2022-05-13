@@ -18,14 +18,14 @@ if __name__ == "__main__":
     convertible_t = [transition for transition in net.net.transitions if transition.name == "t2"][0]
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
-    original, converted = apply_ipp_rule(net, convertible_p)
+    original, converted, place = apply_ipp_rule(net, convertible_p)
     visualizeNet(original, dir_path + "1-1.png")
     visualizeNet(converted, dir_path + "1-2.png")
-    original, converted = apply_ipt_rule(net, convertible_t)
+    original, converted, transition = apply_ipt_rule(net, convertible_t)
     visualizeNet(original, dir_path + "2-1.png")
     visualizeNet(converted, dir_path + "2-2.png")
     target_tpp = [transition for transition in interface.net.transitions if transition.name == "t6"][0]
-    convertible_tpp = [place for place in net.net.places if place.name == "p4"][0]
+    convertible_tpp, transition = [place for place in net.net.places if place.name == "p4"][0]
     original, converted = apply_lti_rule(net, convertible_tpp)
     visualizeNet(original, dir_path + "3-1.png")
     visualizeNet(converted, dir_path + "3-2.png")
