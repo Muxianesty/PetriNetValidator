@@ -20,9 +20,11 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                    dir_path: str, wfn_checked: bool = False) -> PNetsStatus:
     if not dir_path.endswith(os.sep):
         dir_path += os.sep
+    # Unless specified otherwise, the WF-checking is skipped.
     if not wfn_checked:
         if not wfn_alg.apply(interface.net) or not wfn_alg.apply(m_net.net):
             return PNetsStatus.NOT_WFN
+    # Deducing the transformation scheme.
     mode = compareNets(interface, m_net)
     if mode == 0:
         return PNetsStatus.ISOM
@@ -37,12 +39,14 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
         if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
         return PNetsStatus.NON_CONV
+    # Initial visualizing.
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(m_net, dir_path + "net.png")
     counter = int(1)
     need_to_continue: bool = True
     while need_to_continue:
         original, converted = None, None
+        # Working with transitions.
         for net_key in net_dict:
             if mode > 0 and len(int_dict[net_key]) < len(net_dict[net_key]):
                 if int_plcs_count < net_plcs_count and isLocalLabel(net_key):
@@ -91,6 +95,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                         net_dict[net_key].append(new_trs)
             if original is not None:
                 break
+        # Working with places.
         if original is None and int_plcs_count != net_plcs_count:
             plcs_lst = list(m_net.net.places)
             size = len(m_net.net.places)
@@ -128,6 +133,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
             counter += 1
         else:
             need_to_continue = False
+    # Final comparison.
     if compareNets(interface, m_net) == 0:
         visualizeNet(m_net, dir_path + "converted.png")
         return PNetsStatus.FINE
@@ -138,14 +144,17 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
 
 
 def start(first_path: str, second_path: str) -> None:
+    # Parsing the nets.
     first_status, interface = parseNet(first_path)
     second_status, net = parseNet(second_path)
+    # Various statuses checking.
     if first_status == PNetStatus.ERROR or second_status == PNetStatus.ERROR:
         raise NetNotParsableError("PN Validation: One model or both models couldn't be imported.")
     elif first_status == PNetStatus.NOT_WFN or second_status == PNetStatus.NOT_WFN:
         print("PN Validation: One model or both imported models were not WorkFlow Nets -\n"
               "Petri Nets with a singular place for input and a singular place for output with reachable transitions.")
         return
+    # Checking whether the directory has to be created.
     if not os.path.exists(OUTPUT_PATH):
         os.mkdir(OUTPUT_PATH)
     dir_path = OUTPUT_PATH + os.sep + getDirNameFromNets(first_path, second_path) + os.sep

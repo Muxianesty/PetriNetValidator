@@ -4,7 +4,7 @@ from validator.utils import *
 
 
 def apply_fpp_rule(m_net: MarkedPetriNet, target: PetriNet.Place, other: PetriNet.Place = None):
-    if target not in m_net.net.places:
+    if target not in m_net.net.places or target == other:
         return None, None
     src_arcs = target.in_arcs
     src_trs = set(arc.source for arc in src_arcs)
@@ -25,6 +25,7 @@ def apply_fpp_rule(m_net: MarkedPetriNet, target: PetriNet.Place, other: PetriNe
         return None, None
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("FPP-1", {target, other}, original_transitions,
                                                        original_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
+    # Update the possible markings.
     if target in m_net.init_m or other in m_net.init_m:
         if target not in m_net.init_m:
             m_net.init_m[target] = 0
@@ -38,7 +39,7 @@ def apply_fpp_rule(m_net: MarkedPetriNet, target: PetriNet.Place, other: PetriNe
 
 
 def apply_fpt_rule(m_net: MarkedPetriNet, target: PetriNet.Transition, other: PetriNet.Transition = None):
-    if target not in m_net.net.transitions:
+    if target not in m_net.net.transitions or target == other:
         return None, None
     src_arcs = target.in_arcs
     src_trs = set(arc.source for arc in src_arcs)
@@ -89,6 +90,7 @@ def apply_lte_rule(m_net: MarkedPetriNet, target: PetriNet.Transition):
     dst.name = target.name
     for arc in dst.out_arcs:
         add_arc_from_to(src, arc.target, m_net.net, arc.weight, get_arc_type(arc))
+    # Update the possible markings.
     if dst in m_net.init_m:
         if src not in m_net.init_m:
             m_net.init_m[src] = 0

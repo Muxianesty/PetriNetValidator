@@ -72,7 +72,7 @@ def getDirNameFromNets(first_path: str, second_path: str) -> str:
     return os.path.splitext(os.path.basename(first_path))[0] + "-" + os.path.splitext(os.path.basename(second_path))[0]
 
 
-def visualizeNet(m_net: MarkedPetriNet, file_path: str):
+def visualizeNet(m_net: MarkedPetriNet, file_path: str) -> None:
     gviz = pn_viz.apply(m_net.net, initial_marking=m_net.init_m, final_marking=m_net.fin_m, parameters=VIZ_PARAMS)
     pn_viz.save(gviz, file_path)
 
