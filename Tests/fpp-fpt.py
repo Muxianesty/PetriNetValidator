@@ -11,16 +11,16 @@ if __name__ == "__main__":
     if os.path.exists(dir_path):
         shutil.rmtree(dir_path)
     os.mkdir(dir_path)
-    target_p = [place for place in interface.places if place.name == "p2"][0]
-    convertible_p = [place for place in net.places if place.name == "p1"][0]
-    target_t = [transition for transition in interface.transitions if transition.name == "t2"][0]
-    convertible_t = [transition for transition in net.transitions if transition.name == "t2"][0]
+    target_p = [place for place in interface.net.places if place.name == "p2"][0]
+    convertible_p = [place for place in net.net.places if place.name == "p1"][0]
+    target_t = [transition for transition in interface.net.transitions if transition.name == "t2"][0]
+    convertible_t = [transition for transition in net.net.transitions if transition.name == "t2"][0]
     visualizeNet(interface, dir_path + "interface.png")
     visualizeNet(net, dir_path + "net.png")
-    original, converted = apply_fpp_rule(target_p, net, convertible_p)
+    original, converted = apply_fpp_rule(net, target_p)
     visualizeNet(original, dir_path + "1-1.png")
     visualizeNet(converted, dir_path + "1-2.png")
-    original_t, converted_t = apply_fpt_rule(target_t, net, convertible_t)
+    original_t, converted_t = apply_fpt_rule(net, target_t)
     visualizeNet(original_t, dir_path + "2-1.png")
     visualizeNet(converted_t, dir_path + "2-2.png")
     visualizeNet(net, dir_path + "converted.png")
