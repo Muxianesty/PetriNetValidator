@@ -53,7 +53,9 @@ def apply_lti_rule(m_net: MarkedPetriNet, target: PetriNet.Place):
     original_places = {target}
     target_src_trs = set([arc.source for arc in target.in_arcs])
     target_dst_trs = set([arc.target for arc in target.out_arcs])
-    if len(target_src_trs.intersection(target_dst_trs)) != 0:
+    if len(target_src_trs) == 1 and isLocalLabel(list(target_src_trs)[0].label) or \
+        len(target_dst_trs) == 1 and isLocalLabel(list(target_dst_trs)[0].label) or \
+            len(target_src_trs.intersection(target_dst_trs)) != 0:
         return None, None, None
     original_transitions = target_src_trs.union(target_dst_trs)
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("LTI-1", original_places, original_transitions,
