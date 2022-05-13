@@ -58,15 +58,41 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                         net_dict[net_key].pop()
             elif mode < 0 and len(int_dict[net_key]) > len(net_dict[net_key]):
                 if int_plcs_count > net_plcs_count and isLocalLabel(net_key):
-                    for place in m_net.net.places:
-                        first_count = int(0)
-                        second_count = int(0)
-
-                        original, converted, new_trs = apply_lti_rule(m_net, place)
-                        if original is not None:
-                            net_plcs_count += 1
-                            net_dict[net_key].append(new_trs)
-                            break
+                    plcs_lst = list(m_net.net.places)
+                    size = len(m_net.net.places)
+                    marked = [False] * size
+                    for index in range(size):
+                        if not marked[index]:
+                            in_labels = set(arc.source.label for arc in plcs_lst[index].in_arcs)
+                            out_labels = set(arc.target.label for arc in plcs_lst[index].out_arcs)
+                            in_net_src = 0
+                            in_net_dst = 0
+                            for inner_index in range(index + 1, size):
+                                if not marked[index]:
+                                    p_in_labels = set(arc.source.label for arc in plcs_lst[inner_index].in_arcs)
+                                    p_out_labels = set(arc.target.label for arc in plcs_lst[inner_index].out_arc)
+                                    if in_labels == p_in_labels and {EMPTY_LABEL} == p_out_labels:
+                                        in_net_src += 1
+                                        marked[inner_index] = True
+                                    if {EMPTY_LABEL} == p_in_labels and out_labels == p_out_labels:
+                                        in_net_dst += 1
+                                        marked[inner_index] = True
+                            marked[index] = True
+                            in_int_src = 0
+                            in_int_dst = 0
+                            for place in interface.net.places:
+                                p_in_labels = set(arc.source.label for arc in place.in_arcs)
+                                p_out_labels = set(arc.target.label for arc in place.out_arc)
+                                if in_labels == p_in_labels and {EMPTY_LABEL} == p_out_labels:
+                                    in_int_src += 1
+                                if {EMPTY_LABEL} == p_in_labels and out_labels == p_out_labels:
+                                    in_int_dst += 1
+                            if in_int_src > in_net_src or in_int_dst > in_net_dst:
+                                original, converted, new_trs = apply_lti_rule(m_net, plcs_lst[index])
+                                if original is not None:
+                                    net_plcs_count += 1
+                                    net_dict[net_key].append(new_trs)
+                                    break
                 else:
                     original, converted, new_trs = apply_ipt_rule(m_net, net_dict[net_key][0])
                     if original is not None:
@@ -74,14 +100,36 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
             if original is not None:
                 break
         if original is None and int_plcs_count != net_plcs_count:
-            #todo Correct the cases with the places.
-            for place in m_net.net.places:
-                if mode > 0 and int_plcs_count < net_plcs_count:
-                    original, converted = apply_fpp_rule(m_net, place)
-                elif mode < 0 and int_plcs_count > net_plcs_count:
-                    original, converted = apply_ipp_rule(m_net, place)
-                if original is not None:
-                    break
+            plcs_lst = list(m_net.net.places)
+            size = len(m_net.net.places)
+            marked = [False] * size
+            for index in range(size):
+                if not marked[index]:
+                    in_labels = set(arc.source.label for arc in plcs_lst[index].in_arcs)
+                    out_labels = set(arc.target.label for arc in plcs_lst[index].out_arcs)
+                    in_net_src = 1
+                    for inner_index in range(index + 1, size):
+                        if not marked[index]:
+                            p_in_labels = set(arc.source.label for arc in plcs_lst[inner_index].in_arcs)
+                            p_out_labels = set(arc.target.label for arc in plcs_lst[inner_index].out_arcs)
+                            if in_labels == p_in_labels and out_labels == p_out_labels:
+                                in_net_src += 1
+                                marked[inner_index] = True
+                    marked[index] = True
+                    in_int_src = 0
+                    for place in interface.net.places:
+                        p_in_labels = set(arc.source.label for arc in place.in_arcs)
+                        p_out_labels = set(arc.target.label for arc in place.out_arcs)
+                        if in_labels == p_in_labels and out_labels == p_out_labels:
+                            in_int_src += 1
+                    if mode > 0 and int_plcs_count < net_plcs_count and in_int_src < in_net_src:
+                        original, converted = apply_fpp_rule(m_net, plcs_lst[index])
+                        net_plcs_count -= 1
+                    elif mode < 0 and int_plcs_count > net_plcs_count and in_int_src > in_net_src:
+                        original, converted = apply_ipp_rule(m_net, plcs_lst[index])
+                        net_plcs_count += 1
+                    if original is not None:
+                        break
         if original is not None and os.path.exists(dir_path):
             visualizeNet(original, dir_path + str(counter) + "-1.png")
             visualizeNet(converted, dir_path + str(counter) + "-2.png")

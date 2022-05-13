@@ -104,7 +104,7 @@ def isomHash(m_net: MarkedPetriNet) -> int:
     data = list(m_net.net.arcs)
     size = int(len(data))
     for index in range(size):
-        for inner_index in range(index, size):
+        for inner_index in range(index + 1, size):
             if data[index].source != data[inner_index].source and data[index].source != data[inner_index].target and \
                     data[index].target != data[inner_index].source and data[index].target != data[inner_index].target:
                 result += data[index].weight * data[inner_index].weight
