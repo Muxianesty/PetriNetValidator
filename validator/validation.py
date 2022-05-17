@@ -56,7 +56,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                             net_plcs_count -= 1
                             net_dict[net_key].remove(trs)
                             break
-                else:
+                if original is None:
                     original, converted = apply_fpt_rule(m_net, net_dict[net_key][0], net_dict[net_key][-1])
                     if original is not None:
                         net_dict[net_key].pop()
@@ -89,7 +89,7 @@ def validateModels(interface: MarkedPetriNet, m_net: MarkedPetriNet,
                                 net_plcs_count += 1
                                 net_dict[net_key].append(new_trs)
                                 break
-                else:
+                if original is None:
                     original, converted, new_trs = apply_ipt_rule(m_net, net_dict[net_key][0])
                     if original is not None:
                         net_dict[net_key].append(new_trs)

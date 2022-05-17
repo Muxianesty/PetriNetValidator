@@ -23,6 +23,8 @@ def apply_fpp_rule(m_net: MarkedPetriNet, target: PetriNet.Place, other: PetriNe
                 break
     if other is None:
         return None, None
+    original_arcs.update(other.in_arcs)
+    original_arcs.update(other.out_arcs)
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("FPP-1", {target, other}, original_transitions,
                                                        original_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
     # Update the possible markings.
@@ -59,6 +61,8 @@ def apply_fpt_rule(m_net: MarkedPetriNet, target: PetriNet.Transition, other: Pe
                 break
     if other is None:
         return None, None
+    original_arcs.update(other.in_arcs)
+    original_arcs.update(other.out_arcs)
     original_subnet = deepcopy(MarkedPetriNet(PetriNet("FPT-1", original_places, {target, other},
                                                        original_arcs, m_net.net.properties), m_net.init_m, m_net.fin_m))
     remove_transition(m_net.net, other)
